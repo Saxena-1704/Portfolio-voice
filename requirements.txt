@@ -1,0 +1,7 @@
+sounddevice
+silero-vad
+numpy
+faster-whisper
+edge-tts
+python-dotenv
+groq
