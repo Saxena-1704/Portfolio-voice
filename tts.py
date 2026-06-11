@@ -1,5 +1,6 @@
 import os
 import asyncio
+import subprocess
 import numpy as np
 from edge_tts import Communicate
 
@@ -40,16 +41,15 @@ class TextToSpeech:
             pitch=self.pitch,
         )
 
-        proc = await asyncio.create_subprocess_exec(
-            _FFMPEG_PATH,
-            "-i", "pipe:0",
-            "-f", "s16le",
-            "-ac", "1",
-            "-ar", "16000",
-            "pipe:1",
-            stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.DEVNULL,
+        loop = asyncio.get_running_loop()
+        proc = await loop.run_in_executor(
+            None,
+            lambda: subprocess.Popen(
+                [_FFMPEG_PATH, "-i", "pipe:0", "-f", "s16le", "-ac", "1", "-ar", "16000", "pipe:1"],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+            ),
         )
         self._ffmpeg_proc = proc
 
@@ -59,13 +59,13 @@ class TextToSpeech:
                     if self._stopped:
                         break
                     if chunk["type"] == "audio":
-                        proc.stdin.write(chunk["data"])
-                        await proc.stdin.drain()
-            except BrokenPipeError:
+                        await loop.run_in_executor(None, proc.stdin.write, chunk["data"])
+                        await loop.run_in_executor(None, proc.stdin.flush)
+            except (BrokenPipeError, OSError):
                 pass
             finally:
                 try:
-                    proc.stdin.close()
+                    await loop.run_in_executor(None, proc.stdin.close)
                 except Exception:
                     pass
 
@@ -73,7 +73,7 @@ class TextToSpeech:
 
         try:
             while True:
-                data = await proc.stdout.read(4096)
+                data = await loop.run_in_executor(None, proc.stdout.read, 4096)
                 if not data:
                     break
                 if len(data) % 2 != 0:
@@ -85,8 +85,8 @@ class TextToSpeech:
             self._ffmpeg_proc = None
             try:
                 if proc.returncode is None:
-                    proc.kill()
-                await proc.wait()
+                    await loop.run_in_executor(None, proc.kill)
+                await loop.run_in_executor(None, proc.wait)
             except Exception:
                 pass
 

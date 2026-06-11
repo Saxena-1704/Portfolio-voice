@@ -5,3 +5,8 @@ faster-whisper
 edge-tts
 python-dotenv
 groq
+fastapi
+uvicorn[standard]
+twilio
+python-multipart
+ngrok

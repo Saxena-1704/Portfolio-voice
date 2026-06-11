@@ -76,6 +76,7 @@ class VoiceAgentController:
 
         if current == CallState.SPEAKING and started:
             self._sm.transition(CallEvent.INTERRUPT)
+            self.tts.stop()
             await self.audio_device.stop_playback()
 
         if seg is not None:
