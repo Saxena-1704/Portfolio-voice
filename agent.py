@@ -4,7 +4,7 @@ from audio_device import AudioDevice, LocalAudioDevice
 from VAD import VoiceActivityDetector
 from stt_cartesia import CartesiaSTT
 from llm import LLM
-from tts import TextToSpeech
+from tts_cartesia import CartesiaTTS
 from conversation import ConversationManager
 from state_machine import StateMachine, CallState, CallEvent
 from event_bus import EventBus
@@ -17,7 +17,7 @@ class VoiceAgentController:
         vad: VoiceActivityDetector | None = None,
         stt: CartesiaSTT | None = None,
         llm: LLM | None = None,
-        tts: TextToSpeech | None = None,
+        tts: CartesiaTTS | None = None,
         conversation: ConversationManager | None = None,
         event_bus: EventBus | None = None,
     ):
@@ -25,7 +25,7 @@ class VoiceAgentController:
         self.vad = vad or VoiceActivityDetector(min_silence_duration_ms=500)
         self.stt = stt or CartesiaSTT()
         self.llm = llm or LLM()
-        self.tts = tts or TextToSpeech()
+        self.tts = tts or CartesiaTTS()
         self.conversation = conversation or ConversationManager(
             system_prompt=(
                 "You are a friendly and helpful voice assistant on a phone call. "
@@ -107,21 +107,28 @@ class VoiceAgentController:
         if self._sm.state != CallState.PROCESSING:
             return
 
-        print("[LLM] generating...")
-        response = await self.llm.generate(self.conversation.messages)
-        print(f"[LLM] done")
-        print(f"[AGENT] {response}")
-
-        self.conversation.add_turn("assistant", response)
-
-        if self._sm.state != CallState.PROCESSING:
-            return
-
         self._sm.transition(CallEvent.RESPONSE_READY)
         self.vad.reset()
 
-        stream = self.tts.synthesize_stream(response)
-        await self.audio_device.play(stream)
+        full_response: list[str] = []
+        stream = await self.tts.create_stream()
+
+        async def llm_task():
+            async for token in self.llm.generate_stream(
+                self.conversation.messages
+            ):
+                full_response.append(token)
+                await stream.push(token)
+            await stream.finish()
+
+        async def tts_task():
+            await self.audio_device.play(stream.receive())
+
+        await asyncio.gather(llm_task(), tts_task())
+
+        response = "".join(full_response)
+        print(f"[AGENT] {response}")
+        self.conversation.add_turn("assistant", response)
 
         if self._sm.state == CallState.SPEAKING:
             self._sm.transition(CallEvent.PLAYBACK_END)
