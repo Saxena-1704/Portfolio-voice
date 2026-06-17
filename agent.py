@@ -2,7 +2,7 @@ import asyncio
 import numpy as np
 from audio_device import AudioDevice, LocalAudioDevice
 from VAD import VoiceActivityDetector
-from stt import SpeechToText
+from stt_cartesia import CartesiaSTT
 from llm import LLM
 from tts import TextToSpeech
 from conversation import ConversationManager
@@ -15,7 +15,7 @@ class VoiceAgentController:
         self,
         audio_device: AudioDevice | None = None,
         vad: VoiceActivityDetector | None = None,
-        stt: SpeechToText | None = None,
+        stt: CartesiaSTT | None = None,
         llm: LLM | None = None,
         tts: TextToSpeech | None = None,
         conversation: ConversationManager | None = None,
@@ -23,7 +23,7 @@ class VoiceAgentController:
     ):
         self.audio_device = audio_device or LocalAudioDevice()
         self.vad = vad or VoiceActivityDetector(min_silence_duration_ms=500)
-        self.stt = stt or SpeechToText()
+        self.stt = stt or CartesiaSTT()
         self.llm = llm or LLM()
         self.tts = tts or TextToSpeech()
         self.conversation = conversation or ConversationManager(
@@ -66,6 +66,7 @@ class VoiceAgentController:
                 self._processing_task.cancel()
             self._sm.transition(CallEvent.CALL_END)
             await self.audio_device.close()
+            await self.stt.close()
 
     async def stop(self) -> None:
         self._running = False
