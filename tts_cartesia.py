@@ -62,7 +62,7 @@ class CartesiaTTS:
         self.model = model
         self.voice = voice or {
             "mode": "id",
-            "id": "4877b818-c7fe-4c89-b1cf-eadf8e23da72",
+            "id": "1fcd23d0-bf12-4896-8f60-4f21ef5c9b98",
         }
         self._client = AsyncCartesia(api_key=api_key)
         self._conn_mgr = None

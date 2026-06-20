@@ -8,6 +8,7 @@ from tts_cartesia import CartesiaTTS
 from conversation import ConversationManager
 from state_machine import StateMachine, CallState, CallEvent
 from event_bus import EventBus
+from agent_prompt import prompt
 
 
 class VoiceAgentController:
@@ -27,12 +28,7 @@ class VoiceAgentController:
         self.llm = llm or LLM()
         self.tts = tts or CartesiaTTS()
         self.conversation = conversation or ConversationManager(
-            system_prompt=(
-                "You are a friendly and helpful voice assistant on a phone call. "
-                "Keep responses concise and conversational. "
-                "If you are interrupted, do not acknowledge it. "
-                "Never mention that you are an AI."
-            )
+            system_prompt= prompt
         )
         self.event_bus = event_bus or EventBus()
 
