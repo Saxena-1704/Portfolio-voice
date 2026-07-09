@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Voice Bot</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 640px; width: 100%; }
+  h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.875rem; margin-bottom: 1.5rem; }
+  .controls { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+  button { padding: 0.625rem 1.5rem; border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  #startBtn { background: #22c55e; color: #052e16; }
+  #startBtn:hover:not(:disabled) { background: #16a34a; }
+  #stopBtn { background: #ef4444; color: #450a0a; }
+  #stopBtn:hover:not(:disabled) { background: #dc2626; }
+  .status { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #94a3b8; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #64748b; flex-shrink: 0; }
+  .dot.connected { background: #22c55e; }
+  .dot.error { background: #ef4444; }
+  .log { border: 1px solid #334155; border-radius: 10px; padding: 1rem; height: 400px; overflow-y: auto; background: #1e293b; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.875rem; }
+  .log:empty::after { content: 'Conversation will appear here...'; color: #64748b; font-style: italic; }
+  .entry { display: flex; gap: 0.5rem; line-height: 1.5; }
+  .entry.user { color: #93c5fd; }
+  .entry.bot { color: #86efac; }
+  .entry.system { color: #c084fc; }
+  .entry.error { color: #fca5a5; }
+  .label { font-weight: 600; flex-shrink: 0; min-width: 1.8rem; }
+  .entry.user .label::after { content: ''; }
+  .entry.bot .label::after { content: ''; }
+  .vad-bar { width: 100%; height: 4px; background: #334155; border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+  .vad-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #22c55e, #16a34a); transition: width 0.1s; border-radius: 2px; }
+  @media (max-width: 480px) { body { padding: 1rem; } .log { height: 300px; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Portfolio Voice Bot</h1>
+  <p class="subtitle">Real-time voice conversation with the AI resume bot</p>
+
+  <div class="controls">
+    <button id="startBtn">Start Conversation</button>
+    <button id="stopBtn" disabled>Stop</button>
+    <span class="status">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Disconnected</span>
+    </span>
+  </div>
+
+  <div class="vad-bar"><div class="vad-fill" id="vadFill"></div></div>
+
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+// --- State ---
+let ws = null;
+let audioCtx = null;
+let micStream = null;
+let scriptNode = null;
+let gainNode = null;
+let connected = false;
+let playQueue = [];
+let isPlaying = false;
+let nextPlayTime = 0;
+let recording = false;
+const ACCUM_SAMPLES = 1600;
+let accBuf = [];
+let accumTimer = null;
+
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const statusDot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+const logEl = document.getElementById('log');
+const vadFill = document.getElementById('vadFill');
+
+const WS_URL = `wss://37f9-49-43-161-21.ngrok-free.app/ws/audio`;
+const SAMPLE_RATE = 16000;
+const CHUNK_SIZE = 256;
+
+// --- Logging ---
+function log(type, text) {
+  const labels = { user: '>', bot: '<', system: '*', error: '!' };
+  const div = document.createElement('div');
+  div.className = `entry ${type}`;
+  div.innerHTML = `<span class="label">${labels[type] || '*'}</span><span>${escapeHtml(text)}</span>`;
+  logEl.appendChild(div);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// --- WebSocket ---
+function connect() {
+  if (ws) return;
+  ws = new WebSocket(WS_URL);
+  ws.binaryType = 'arraybuffer';
+
+  ws.onopen = () => {
+    connected = true;
+    statusDot.className = 'dot connected';
+    statusText.textContent = 'Connected';
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    log('system', 'Connected to voice bot server.');
+    startMic();
+  };
+
+  ws.onmessage = (e) => {
+    if (e.data instanceof ArrayBuffer) {
+      const samples = new Int16Array(e.data);
+      queuePlayback(samples);
+    }
+  };
+
+  ws.onclose = () => {
+    connected = false;
+    statusDot.className = 'dot';
+    statusText.textContent = 'Disconnected';
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    stopMic();
+    log('system', 'Disconnected from server.');
+    ws = null;
+  };
+
+  ws.onerror = () => {
+    statusDot.className = 'dot error';
+    statusText.textContent = 'Connection error';
+    log('error', 'WebSocket error — is the server running on port 8765?');
+  };
+}
+
+function disconnect() {
+  if (ws) {
+    ws.onclose = null;
+    ws.close();
+    ws = null;
+  }
+  connected = false;
+  stopMic();
+  statusDot.className = 'dot';
+  statusText.textContent = 'Disconnected';
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+}
+
+// --- Microphone capture ---
+async function startMic() {
+  try {
+    audioCtx = new AudioContext({ sampleRate: SAMPLE_RATE });
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+    });
+    const source = audioCtx.createMediaStreamSource(micStream);
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = 1.0;
+    source.connect(gainNode);
+
+    scriptNode = audioCtx.createScriptProcessor(CHUNK_SIZE, 1, 1);
+    gainNode.connect(scriptNode);
+    scriptNode.connect(audioCtx.destination);
+
+    scriptNode.onaudioprocess = (e) => {
+      if (!connected) return;
+      const input = e.inputBuffer.getChannelData(0);
+      const int16 = new Int16Array(input.length);
+      for (let i = 0; i < input.length; i++) {
+        const s = Math.max(-1, Math.min(1, input[i]));
+        int16[i] = s < 0 ? s * 32768 : s * 32767;
+      }
+      ws.send(int16.buffer);
+    };
+
+    recording = true;
+    log('system', 'Microphone active. Start speaking...');
+  } catch (err) {
+    log('error', `Mic error: ${err.message}. Check permissions.`);
+  }
+}
+
+function stopMic() {
+  recording = false;
+  if (accumTimer) { clearTimeout(accumTimer); accumTimer = null; }
+  accBuf = [];
+  if (scriptNode) { scriptNode.disconnect(); scriptNode = null; }
+  if (gainNode) { gainNode.disconnect(); gainNode = null; }
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
+  playQueue = [];
+  isPlaying = false;
+}
+
+// --- Audio playback ---
+function flushAccum() {
+  if (accBuf.length === 0) return;
+  if (accumTimer) { clearTimeout(accumTimer); accumTimer = null; }
+  const totalLen = accBuf.reduce((s, a) => s + a.length, 0);
+  const merged = new Int16Array(totalLen);
+  let offset = 0;
+  for (const a of accBuf) { merged.set(a, offset); offset += a.length; }
+  accBuf = [];
+  playQueue.push(merged);
+  if (!isPlaying) playNext();
+}
+
+function scheduleAccumFlush() {
+  if (accumTimer) clearTimeout(accumTimer);
+  accumTimer = setTimeout(flushAccum, 200);
+}
+
+function queuePlayback(samples) {
+  accBuf.push(samples);
+  let total = 0;
+  for (const a of accBuf) total += a.length;
+  if (total >= ACCUM_SAMPLES) flushAccum();
+  scheduleAccumFlush();
+}
+
+function playNext() {
+  if (playQueue.length === 0) { isPlaying = false; return; }
+  isPlaying = true;
+  const samples = playQueue.shift();
+
+  if (!audioCtx || audioCtx.state === 'closed') { isPlaying = false; return; }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const buf = audioCtx.createBuffer(1, samples.length, SAMPLE_RATE);
+  const ch = buf.getChannelData(0);
+  for (let i = 0; i < samples.length; i++) ch[i] = samples[i] / 32768;
+
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  src.connect(audioCtx.destination);
+
+  const now = audioCtx.currentTime;
+  if (now >= nextPlayTime) nextPlayTime = now;
+  src.start(nextPlayTime);
+  nextPlayTime += samples.length / SAMPLE_RATE;
+  src.onended = () => playNext();
+}
+
+// --- VAD level indicator (visual only) ---
+function updateVad() {
+  if (!connected || !audioCtx) { vadFill.style.width = '0%'; return; }
+  setInterval(() => {
+    if (!connected) { vadFill.style.width = '0%'; return; }
+    vadFill.style.width = (20 + Math.random() * 10) + '%';
+  }, 200);
+}
+updateVad();
+
+// --- Buttons ---
+startBtn.addEventListener('click', connect);
+stopBtn.addEventListener('click', disconnect);
+</script>
+</body>
+</html>

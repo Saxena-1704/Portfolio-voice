@@ -8,6 +8,3 @@ groq
 cartesia[websockets]
 fastapi
 uvicorn[standard]
-twilio
-python-multipart
-ngrok
