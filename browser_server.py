@@ -19,7 +19,7 @@ app.add_middleware(
 
 @app.get("/")
 async def index():
-    return FileResponse("static/index.html")
+    return FileResponse("static/classic.html")
 
 
 @app.websocket("/ws/audio")

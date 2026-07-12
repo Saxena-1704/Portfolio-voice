@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arannav Saxena - AI Engineer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter for main text, Fira Code for technical accents -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                        code: {
+                            keyword: '#d946ef', /* fuchsia-500 */
+                            func: '#3b82f6', /* blue-500 */
+                            string: '#10b981', /* emerald-500 */
+                            comment: '#9ca3af', /* gray-400 */
+                            class: '#f59e0b', /* amber-500 */
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'blink': 'blink 1s step-end infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        },
+                        blink: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #fdfdfd;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* Subtle premium grid background */
+        .bg-grid-fade {
+            background-image: 
+                linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .glass-nav {
+            background: rgba(253, 253, 253, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+
+        .premium-card {
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 32px 64px -12px rgba(0, 0, 0, 0.08);
+            border-color: #e2e8f0;
+        }
+
+        /* Image Grounding Setup */
+        .hero-img-container {
+            position: relative;
+            /* Fades the bottom 15% of the image so it blends into the deck */
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
+        }
+
+        .hero-img {
+            position: relative;
+            z-index: 10;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+            transition: filter 0.5s ease;
+        }
+        .hero-img:hover {
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.2));
+        }
+
+        /* Abstract Code Backgrounds */
+        .bg-code {
+            position: absolute;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            line-height: 1.5;
+            opacity: 0.15;
+            user-select: none;
+            pointer-events: none;
+            z-index: -1;
+            white-space: pre;
+        }
+
+        /* Canvas overlays */
+        #neural-canvas, #graph-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        #neural-canvas { z-index: 0; opacity: 0.7; }
+        #graph-canvas { z-index: -1; opacity: 0.4; }
+
+        /* Timeline for Resume */
+        .timeline-dot {
+            position: relative;
+        }
+        .timeline-dot::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #0f172a;
+            z-index: 10;
+        }
+        .timeline-line::after {
+            content: '';
+            position: absolute;
+            left: 13px; /* aligns with center of dot */
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+        .timeline-item:last-child .timeline-line::after {
+            display: none;
+        }
+
+        /* Text Gradient */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #0f172a 0%, #475569 100%);
+        }
+
+        .type-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1em;
+            background-color: #0f172a;
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 1s step-end infinite;
+        }
+
+        /* Mic button active/calling state */
+        #talkMicBtn.active {
+            transform: scale(1.15);
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 10px 40px rgba(239, 68, 68, 0.2);
+        }
+        #talkMicBtn.active .mic-icon {
+            color: #ef4444;
+        }
+        #talkMicBtn.active .mic-viz > div {
+            animation: micBounce 0.6s ease-in-out infinite alternate;
+        }
+        #talkMicBtn.active .mic-viz > div:nth-child(1) { animation-delay: 0s; }
+        #talkMicBtn.active .mic-viz > div:nth-child(2) { animation-delay: 0.1s; }
+        #talkMicBtn.active .mic-viz > div:nth-child(3) { animation-delay: 0.2s; }
+        #talkMicBtn.active .mic-viz > div:nth-child(4) { animation-delay: 0.3s; }
+        #talkMicBtn.active .mic-viz > div:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes micBounce {
+            from { transform: scaleY(1); }
+            to { transform: scaleY(2.2); }
+        }
+
+        /* Mic status indicator */
+        #micStatus.visible {
+            opacity: 1;
+        }
+        #micStatus .mic-status-dot.dot-green {
+            background: #10b981;
+            animation: statusPulse 1.5s infinite;
+        }
+        #micStatus .mic-status-dot.dot-red {
+            background: #ef4444;
+        }
+        #micStatus .mic-status-dot.dot-amber {
+            background: #f59e0b;
+            animation: statusPulse 1s infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased relative">
+
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-2]">
+        <div class="bg-grid-fade"></div>
+        <!-- Colorful Code Background 1 (Top Left) -->
+        <div class="bg-code" style="top: 15%; left: 2%; transform: rotate(-5deg);">
+<span class="text-code-keyword">import</span> torch
+<span class="text-code-keyword">import</span> torch.nn <span class="text-code-keyword">as</span> nn
+
+<span class="text-code-keyword">class</span> <span class="text-code-class">AttentionAgent</span>(nn.Module):
+    <span class="text-code-keyword">def</span> <span class="text-code-func">__init__</span>(self, d_model):
+        <span class="text-code-func">super</span>().__init__()
+        self.q = nn.Linear(d_model, d_model)
+        self.k = nn.Linear(d_model, d_model)
+        self.v = nn.Linear(d_model, d_model)
+        
+    <span class="text-code-keyword">def</span> <span class="text-code-func">forward</span>(self, x):
+        <span class="text-code-comment"># Compute self-attention</span>
+        scores = torch.matmul(self.q(x), self.k(x).T)
+        <span class="text-code-keyword">return</span> torch.softmax(scores, dim=-1) @ self.v(x)
+        </div>
+
+        <!-- Colorful Code Background 2 (Right Side) -->
+        <div class="bg-code" style="top: 60%; right: 5%; transform: rotate(3deg);">
+<span class="text-code-keyword">from</span> langchain.agents <span class="text-code-keyword">import</span> AgentExecutor
+<span class="text-code-keyword">from</span> langchain.memory <span class="text-code-keyword">import</span> ConversationBufferMemory
+
+<span class="text-code-keyword">def</span> <span class="text-code-func">initialize_rag_pipeline</span>(context_db):
+    memory = ConversationBufferMemory(
+        memory_key=<span class="text-code-string">"chat_history"</span>, 
+        return_messages=<span class="text-code-keyword">True</span>
+    )
+    
+    agent = create_conversational_retrieval_agent(
+        llm=chat_model,
+        retriever=context_db.as_retriever(),
+        memory=memory
+    )
+    <span class="text-code-keyword">return</span> agent
+        </div>
+    </div>
+
+    <nav class="fixed w-full z-50 glass-nav" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
+                        <div class="w-8 h-8 bg-gray-900 flex items-center justify-center text-white rounded-md relative overflow-hidden">
+                            <span class="font-mono text-sm font-semibold z-10">A</span>
+                        </div>
+                        <span class="font-mono tracking-tighter">Arannav<span class="text-brand-500">_</span></span>
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8 font-medium text-sm text-gray-600 font-mono">
+                    <a href="#about" class="hover:text-gray-900 transition-colors">/resume</a>
+                    <a href="#skills" class="hover:text-gray-900 transition-colors">/skills</a>
+                    <a href="#projects" class="hover:text-gray-900 transition-colors">/deployments</a>
+                    <a href="#blogs" class="hover:text-gray-900 transition-colors">/logs</a>
+                    <a href="Arannav_Saxena_Resume.pdf" target="_blank" class="px-5 py-2.5 rounded-lg text-white bg-gray-900 hover:bg-gray-800 shadow-md transition-all duration-300 font-sans">
+                        Download PDF
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-gray-900 focus:outline-none p-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white/95 backdrop-blur-xl border-b border-gray-100 absolute w-full text-sm font-medium shadow-xl">
+            <div class="px-4 pt-2 pb-6 space-y-2 font-mono">
+                <a href="#about" class="block px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50">/resume</a>
+                <a href="#skills" class="block px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50">/skills</a>
+                <a href="#projects" class="block px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50">/deployments</a>
+                <a href="#blogs" class="block px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50">/logs</a>
+                <a href="Arannav_Saxena_Resume.pdf" target="_blank" class="block px-4 py-3 mt-4 text-center text-white bg-gray-900 rounded-lg font-sans">Download PDF</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Interactive Neural Net Canvas -->
+        <canvas id="neural-canvas"></canvas>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8">
+                
+                <!-- Text Content -->
+                <div class="w-full lg:w-1/2 flex flex-col justify-center animate-fade-in-up">
+                    <div class="inline-flex items-center space-x-2 mb-6 glass-panel rounded-full px-4 py-1.5 w-max">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <span class="font-mono text-xs text-gray-600 font-medium">System Online</span>
+                    </div>
+                    
+                    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-[1.1]">
+                        <span class="text-gradient block mb-2">Arannav Saxena.</span>
+                        <!-- LLM Typing Effect -->
+                        <span class="text-3xl sm:text-4xl lg:text-5xl text-gray-800 font-semibold block h-[1.2em] flex items-center">
+                            <span id="typing-text"></span><span class="type-cursor"></span>
+                        </span>
+                    </h1>
+                    
+                    <p class="text-lg text-gray-600 mb-10 max-w-lg font-light leading-relaxed">
+                        Hi, I'm Arannav Saxena, I'm a B.Tech final year student in Computer Science with a strong passion for Machine Learning and Artificial Intelligence. I have working experience as a Generative AI Intern. I'm constantly learning, experimenting, and exploring new concepts, with the goal of applying AI to solve real-world problems.
+                    </p>
+                    
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="#projects" class="px-8 py-3.5 rounded-lg bg-gray-900 text-white font-medium hover:bg-gray-800 shadow-lg shadow-gray-900/10 hover:shadow-gray-900/20 hover:-translate-y-0.5 transition-all duration-300">
+                            View Deployments
+                        </a>
+                        <a href="#about" class="px-8 py-3.5 rounded-lg bg-white text-gray-700 font-mono text-sm border border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm transition-all duration-300 flex items-center gap-2">
+                            cat resume.md
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Image with Grounding Deck -->
+                <div class="w-full lg:w-1/2 flex justify-center lg:justify-end animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <!-- The overall wrapper for the image and the deck -->
+                    <div class="relative w-[320px] sm:w-[400px] lg:w-[480px] h-[450px] lg:h-[550px] flex flex-col items-center justify-end">
+                        
+                        <!-- Floating Telemetry Badges (Behind/Around Image) -->
+                        <div class="absolute top-10 left-0 lg:-left-10 glass-panel px-3 py-2 rounded-lg font-mono text-[10px] text-gray-700 animate-float z-20 flex items-center gap-2 shadow-sm">
+                            <i class="fas fa-microchip text-brand-500"></i> ctx_window: 128k
+                        </div>
+                        <div class="absolute top-1/3 right-0 lg:-right-8 glass-panel px-3 py-2 rounded-lg font-mono text-[10px] text-gray-700 animate-float-delayed z-20 flex items-center gap-2 shadow-sm">
+                            <i class="fas fa-network-wired text-emerald-500"></i> vector_db: active
+                        </div>
+
+                        <!-- Image Container with Bottom Fade -->
+                        <div class="hero-img-container w-full h-[85%] relative z-10 flex justify-center items-end">
+                            <!-- NOTE: Tilted left, looking at camera (assuming this is how the photo naturally is) -->
+                            <img src="me good.png" alt="Arannav Saxena" class="hero-img w-[75%] h-full object-cover object-bottom" onerror="this.src='https://placehold.co/400x500/ffffff/0f172a?text=Transparent+Waist-Up+Photo'">
+                        </div>
+
+                        <!-- Grounding Dashboard Deck (Overlaps the bottom of the faded image) -->
+                        <div class="absolute bottom-0 w-[110%] h-24 glass-panel z-30 rounded-2xl flex items-center justify-around px-6 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
+                            <!-- Deck Stat 1 -->
+                            <div class="flex flex-col">
+                                <span class="font-mono text-[10px] text-gray-400 uppercase tracking-wider mb-1">Status</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span class="font-semibold text-sm text-gray-800">Operational</span>
+                                </div>
+                            </div>
+                            <!-- Deck Divider -->
+                            <div class="h-10 w-px bg-gray-200"></div>
+                            <!-- Deck Stat 2 -->
+                            <div class="flex flex-col">
+                                <span class="font-mono text-[10px] text-gray-400 uppercase tracking-wider mb-1">Model Perf</span>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-chart-line text-brand-500 text-xs"></i>
+                                    <span class="font-semibold text-sm text-gray-800">98.4% Acc</span>
+                                </div>
+                            </div>
+                            <!-- Deck Divider -->
+                            <div class="h-10 w-px bg-gray-200"></div>
+                            <!-- Deck Stat 3 -->
+                            <div class="flex flex-col">
+                                <span class="font-mono text-[10px] text-gray-400 uppercase tracking-wider mb-1">Latency</span>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-bolt text-amber-500 text-xs"></i>
+                                    <span class="font-semibold text-sm text-gray-800">~120ms</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-24 relative bg-white border-y border-gray-100">
+        <!-- SVG Data Graph Background -->
+        <canvas id="graph-canvas"></canvas>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <div class="inline-block px-3 py-1 rounded-full bg-gray-100 border border-gray-200 font-mono text-xs text-gray-500 mb-4">
+                    <span class="text-gray-400 mr-2">01.</span> Resume
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 tracking-tight">Professional Trajectory</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                
+                <!-- Experience Timeline -->
+                <div class="relative pl-6 lg:pl-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                        <i class="fas fa-briefcase text-gray-400"></i> Experience
+                    </h3>
+                    
+                    <div class="space-y-10 border-l-2 border-gray-100 timeline-line pl-8 relative">
+                        
+                        <!-- Timeline Item 1 -->
+                        <div class="timeline-item timeline-dot">
+                            <span class="font-mono text-xs font-semibold text-brand-600 mb-1 block">Previous</span>
+                            <h4 class="text-lg font-bold text-gray-900">Generative AI Intern</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education & Skills -->
+                <div id="skills" class="relative pl-6 lg:pl-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                        <i class="fas fa-graduation-cap text-gray-400"></i> Education
+                    </h3>
+                    
+                    <div class="space-y-10 border-l-2 border-gray-100 timeline-line pl-8 relative mb-12">
+                        <!-- Education Item 1 -->
+                        <div class="timeline-item timeline-dot">
+                            <span class="font-mono text-xs font-semibold text-brand-600 mb-1 block">Present</span>
+                            <h4 class="text-lg font-bold text-gray-900">B.Tech in Computer Science</h4>
+                            <p class="text-gray-600 text-sm font-light leading-relaxed">
+                                Final year student with a strong passion for Machine Learning and Artificial Intelligence.
+                            </p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                        <i class="fas fa-code text-gray-400"></i> Core Stack
+                    </h3>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <!-- Skill Box -->
+                        <div class="p-5 rounded-xl bg-gray-50 border border-gray-100">
+                            <h4 class="font-mono text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">AI / ML</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700">Python</span>
+                                <span class="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700">PyTorch</span>
+                                <span class="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700">LangChain</span>
+                                <span class="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700">NLP</span>
+                            </div>
+                        </div>
+                        <!-- Skill Box -->
+                        <div class="p-5 rounded-xl bg-gray-50 border border-gray-100">
+                            <h4 class="font-mono text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">Backend & Ops</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700">FastAPI</span>
+                                <span class="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700">Qdrant DB</span>
+                                <span class="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700">Docker</span>
+                                <span class="px-2.5 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700">LiveKit</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-24 relative z-10 bg-[#fdfdfd]">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-block px-3 py-1 rounded-full bg-gray-100 border border-gray-200 font-mono text-xs text-gray-500 mb-4">
+                    <span class="text-gray-400 mr-2">02.</span> Deployments
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4 tracking-tight">Agentic Systems</h2>
+                <p class="text-base text-gray-500 font-light max-w-2xl mx-auto">Production-ready AI workflows and experimental architectures.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Project 1 -->
+                <div class="premium-card rounded-2xl overflow-hidden group flex flex-col h-full">
+                    <div class="relative h-56 overflow-hidden bg-gray-100 p-6 flex items-center justify-center border-b border-gray-100">
+                        <img src="images/Multi agent AI system image.jpg" alt="Multi-Agent System" class="w-full h-full object-cover rounded-lg shadow-sm transform group-hover:scale-105 transition-transform duration-700 ease-in-out" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=System+Architecture'">
+                        <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-2 py-1 rounded text-[10px] font-mono text-gray-700 shadow-sm flex items-center gap-1.5 border border-gray-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> status: live
+                        </div>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] font-medium text-gray-500">
+                            <span class="bg-gray-100 px-2 py-1 rounded">#langchain</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded">#agents</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Multi Agent AI System</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow leading-relaxed font-light">
+                            A system built using LangChain consisting of multiple agents like the classifier agent, the PDF agent, the email agent and the JSON agent.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                            <a href="https://github.com/Saxena-1704/Final-Submission.git" class="text-xs font-mono text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2"><i class="fab fa-github text-sm"></i> view_source</a>
+                            <a href="https://drive.google.com/file/d/1awc5ngPQiKbsWsZleEoGUl_XzWpirThL/view?usp=sharing" class="text-xs font-mono font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                                Execute Demo <i class="fas fa-arrow-right text-[10px] ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="premium-card rounded-2xl overflow-hidden group flex flex-col h-full">
+                    <div class="relative h-56 overflow-hidden bg-gray-100 p-6 flex items-center justify-center border-b border-gray-100">
+                        <img src="images/Call handling Agent.jpg" alt="Call Handling Agent" class="w-full h-full object-cover rounded-lg shadow-sm transform group-hover:scale-105 transition-transform duration-700 ease-in-out" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Voice+Interface'">
+                        <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-2 py-1 rounded text-[10px] font-mono text-gray-700 shadow-sm flex items-center gap-1.5 border border-gray-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> latency: 124ms
+                        </div>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] font-medium text-gray-500">
+                            <span class="bg-gray-100 px-2 py-1 rounded">#voice-ai</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded">#groq</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Call Handling Agent</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow leading-relaxed font-light">
+                            Built a modular real-time voice agent from the ground up using an asynchronous state machine, custom Silero VAD, streaming Cartesia STT/TTS, and Groq LLM, achieving sub-2s response latency across multiple interactions.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                            <a href="https://github.com/Saxena-1704/Call_handling_agent" class="text-xs font-mono text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2"><i class="fab fa-github text-sm"></i> view_source</a>
+                            <a href="https://drive.google.com/file/d/1LFtpCm2WwJA0Ihj3H3BX5Q8QdbpD2K5v/view?usp=sharing" class="text-xs font-mono font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                                Execute Demo <i class="fas fa-arrow-right text-[10px] ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="premium-card rounded-2xl overflow-hidden group flex flex-col h-full">
+                    <div class="relative h-56 overflow-hidden bg-gray-100 p-6 flex items-center justify-center border-b border-gray-100">
+                        <img src="images/AI Astrologer Image.jpeg" alt="AI Astrologer" class="w-full h-full object-cover rounded-lg shadow-sm transform group-hover:scale-105 transition-transform duration-700 ease-in-out" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=RAG+Database'">
+                        <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-2 py-1 rounded text-[10px] font-mono text-gray-700 shadow-sm flex items-center gap-1.5 border border-gray-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> index: loaded
+                        </div>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] font-medium text-gray-500">
+                            <span class="bg-gray-100 px-2 py-1 rounded">#agents</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded">#astrology</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">AI Astrologer Agent</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow leading-relaxed font-light">
+                            An agent that takes the details of the user and provides accurate astrology predictions.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                            <a href="https://github.com/Saxena-1704/AI-Astrologer-Agent.git" class="text-xs font-mono text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2"><i class="fab fa-github text-sm"></i> view_source</a>
+                            <a href="https://drive.google.com/file/d/1rVP79lGPGdw-eiqpBu2rxnk0xGBbzenV/view?usp=sharing" class="text-xs font-mono font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                                Execute Demo <i class="fas fa-arrow-right text-[10px] ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="premium-card rounded-2xl overflow-hidden group flex flex-col h-full">
+                    <div class="relative h-56 overflow-hidden bg-gray-100 p-6 flex items-center justify-center border-b border-gray-100">
+                        <img src="images/data collection agent.jpg" alt="Data Collection Agent" class="w-full h-full object-cover rounded-lg shadow-sm transform group-hover:scale-105 transition-transform duration-700 ease-in-out" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Data+Stream'">
+                        <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-2 py-1 rounded text-[10px] font-mono text-gray-700 shadow-sm flex items-center gap-1.5 border border-gray-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> stream: active
+                        </div>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] font-medium text-gray-500">
+                            <span class="bg-gray-100 px-2 py-1 rounded">#livekit</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded">#data-pipeline</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Voice AI Data Collection Agent</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow leading-relaxed font-light">
+                            A Voice agent built using LiveKit which collects data like Name, city and phone number from the user.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                            <a href="https://github.com/Saxena-1704/data_collection_agent.git" class="text-xs font-mono text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2"><i class="fab fa-github text-sm"></i> view_source</a>
+                            <a href="https://drive.google.com/file/d/1HoBajNpeyWj20yXdLegZI6NKW7xK336y/view?usp=sharing" class="text-xs font-mono font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                                Execute Demo <i class="fas fa-arrow-right text-[10px] ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="premium-card rounded-2xl overflow-hidden group flex flex-col h-full">
+                    <div class="relative h-56 overflow-hidden bg-gray-100 p-6 flex items-center justify-center border-b border-gray-100">
+                        <img src="https://placehold.co/600x400/e2e8f0/64748b?text=Raag+Detector" alt="Raag Detector" class="w-full h-full object-cover rounded-lg shadow-sm transform group-hover:scale-105 transition-transform duration-700 ease-in-out">
+                        <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-2 py-1 rounded text-[10px] font-mono text-gray-700 shadow-sm flex items-center gap-1.5 border border-gray-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> model: training
+                        </div>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] font-medium text-gray-500">
+                            <span class="bg-gray-100 px-2 py-1 rounded">#transfer-learning</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded">#audio</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Raag Detector</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow leading-relaxed font-light">
+                            A foundational model for detecting Raags (Indian Classical Music). Made using transfer learning on the pretrained model YAMNet.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                            <a href="https://github.com/Saxena-1704/Raag-Detector.git" class="text-xs font-mono text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2"><i class="fab fa-github text-sm"></i> view_source</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 6 -->
+                <div class="premium-card rounded-2xl overflow-hidden group flex flex-col h-full">
+                    <div class="relative h-56 overflow-hidden bg-gray-100 p-6 flex items-center justify-center border-b border-gray-100">
+                        <img src="images/book publisher agent.jpeg" alt="Book Publisher Agent" class="w-full h-full object-cover rounded-lg shadow-sm transform group-hover:scale-105 transition-transform duration-700 ease-in-out" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Book+Publisher'">
+                        <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-2 py-1 rounded text-[10px] font-mono text-gray-700 shadow-sm flex items-center gap-1.5 border border-gray-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> status: live
+                        </div>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] font-medium text-gray-500">
+                            <span class="bg-gray-100 px-2 py-1 rounded">#web-scraping</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded">#content-gen</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Book Publisher Agent</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow leading-relaxed font-light">
+                            An agent with the ability to scrape any content from the web and then publish content about it according to the user.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                            <a href="https://github.com/Saxena-1704/Book-Publisher-Agent.git" class="text-xs font-mono text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2"><i class="fab fa-github text-sm"></i> view_source</a>
+                            <a href="https://drive.google.com/file/d/1d0NbgUid0blgPRc35L-0_DopZFlg2vhg/view?usp=sharing" class="text-xs font-mono font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                                Execute Demo <i class="fas fa-arrow-right text-[10px] ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 7 -->
+                <div class="premium-card rounded-2xl overflow-hidden group flex flex-col h-full">
+                    <div class="relative h-56 overflow-hidden bg-gray-100 p-6 flex items-center justify-center border-b border-gray-100">
+                        <img src="https://placehold.co/600x400/e2e8f0/64748b?text=RAG+Agent" alt="RAG Agent" class="w-full h-full object-cover rounded-lg shadow-sm transform group-hover:scale-105 transition-transform duration-700 ease-in-out">
+                        <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-2 py-1 rounded text-[10px] font-mono text-gray-700 shadow-sm flex items-center gap-1.5 border border-gray-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> index: loaded
+                        </div>
+                    </div>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] font-medium text-gray-500">
+                            <span class="bg-gray-100 px-2 py-1 rounded">#rag</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded">#vector-db</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">RAG Agent</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow leading-relaxed font-light">
+                            An RAG agent that contains the knowledge of the stock market page from Wikipedia.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                            <a href="https://github.com/Saxena-1704/RAG-Agent.git" class="text-xs font-mono text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2"><i class="fab fa-github text-sm"></i> view_source</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-16 text-center">
+                <a href="https://github.com/Saxena-1704" target="_blank" class="inline-flex items-center gap-2 font-mono text-sm text-gray-500 hover:text-gray-900 transition-colors underline decoration-dashed underline-offset-4">
+                    view_all_repositories()
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blogs Section -->
+    <section id="blogs" class="py-24 bg-white relative border-t border-gray-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <div class="inline-block px-3 py-1 rounded-full bg-gray-100 border border-gray-200 font-mono text-xs text-gray-500 mb-4">
+                        <span class="text-gray-400 mr-2">03.</span> Logs
+                    </div>
+                    <h2 class="text-4xl font-bold text-gray-900 tracking-tight">Technical Writings</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Blog 1 -->
+                <a href="blogs/blog1.html" class="group premium-card p-8 rounded-2xl flex flex-col h-full">
+                    <div class="font-mono text-xs text-gray-400 mb-4">Posted: 2025-09-18</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-brand-600 transition-colors">Training from Scratch vs Finetuning vs Transfer Learning</h3>
+                    <p class="text-gray-600 text-sm mb-6 flex-grow font-light leading-relaxed">This blog explores the difference between Training a neural network from scratch, finetuning a pretrained model and using transfer learning on a pretrained model.</p>
+                    <div class="font-mono text-xs font-semibold text-brand-600 mt-auto flex items-center">
+                        Read Article <i class="fas fa-arrow-right ml-2 text-[10px] transition-transform group-hover:translate-x-1"></i>
+                    </div>
+                </a>
+
+                <!-- Placeholder Blog 2 -->
+                <a href="#" class="group p-8 rounded-2xl flex flex-col h-full bg-gray-50 border border-dashed border-gray-300">
+                    <div class="font-mono text-xs text-gray-400 mb-4">Status: Drafting</div>
+                    <h3 class="text-xl font-bold text-gray-500 mb-3">Building Effective RAG Pipelines</h3>
+                    <p class="text-gray-400 text-sm mb-6 flex-grow font-light leading-relaxed">A practical guide to implementing Retrieval-Augmented Generation for reducing hallucinations in Large Language Models. (Coming soon)</p>
+                    <div class="font-mono text-xs font-semibold text-gray-400 mt-auto flex items-center">
+                        Awaiting Publish <span class="ml-2 animate-pulse">_</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 bg-gray-900 text-white relative overflow-hidden rounded-t-[3rem]">
+        <!-- Tech grid overlay -->
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;"></div>
+
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col items-center">
+            <div class="inline-flex items-center px-3 py-1 rounded border border-white/20 text-[10px] font-mono text-gray-300 mb-8 bg-white/5">
+                system.connect()
+            </div>
+            
+            <h2 class="text-5xl md:text-6xl font-bold mb-6 tracking-tight text-white">Initialize Sync</h2>
+            <p class="text-lg text-gray-400 mb-10 font-light max-w-xl leading-relaxed">
+                Currently open for new opportunities to build intelligent systems. Let's process some ideas together.
+            </p>
+            
+            <a href="mailto:arannav174@gmail.com" class="px-8 py-3.5 rounded-lg bg-white text-gray-900 font-semibold hover:bg-gray-100 shadow-lg hover:-translate-y-1 transition-all duration-300 flex items-center gap-3">
+                <i class="fas fa-paper-plane text-sm"></i> Send Request
+            </a>
+
+            <div class="mt-24 w-full">
+                <div class="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full mb-8"></div>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex space-x-6">
+                        <a href="https://github.com/Saxena-1704" target="_blank" class="text-gray-500 hover:text-white transition-all">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/arannav-saxena-63718b221/" target="_blank" class="text-gray-500 hover:text-white transition-all">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                        <a href="mailto:arannav174@gmail.com" class="text-gray-500 hover:text-white transition-all">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </a>
+                    </div>
+                    <p class="font-mono text-xs text-gray-500">
+                        &copy; <span id="year"></span> <span class="text-white">sys.</span>arannav
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FIXED WIDGETS -->
+    
+    <!-- Premium "Talk to Me" Voice Widget (Fixed Bottom Center) -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] group" id="micWidget">
+        <div id="micStatus" class="absolute -top-8 left-1/2 transform -translate-x-1/2 font-mono text-[10px] text-gray-500 opacity-0 transition-opacity duration-300 whitespace-nowrap flex items-center gap-1.5 pointer-events-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-gray-400 mic-status-dot"></span>
+            <span class="mic-status-text"></span>
+        </div>
+        <button id="talkMicBtn" class="flex items-center gap-3 bg-white/95 backdrop-blur-md border border-gray-200 px-6 py-3 rounded-full shadow-[0_10px_30px_rgb(0,0,0,0.1)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.15)] hover:border-gray-300 transition-all duration-300 hover:-translate-y-1">
+            <!-- Audio visualizer bars -->
+            <div class="flex items-end h-3 gap-[2px] mr-1 opacity-70 group-hover:opacity-100 mic-viz">
+                <div class="w-1 bg-gray-800 rounded-t h-[40%]"></div>
+                <div class="w-1 bg-gray-800 rounded-t h-[80%]"></div>
+                <div class="w-1 bg-gray-800 rounded-t h-[30%]"></div>
+                <div class="w-1 bg-gray-800 rounded-t h-[100%]"></div>
+                <div class="w-1 bg-gray-800 rounded-t h-[60%]"></div>
+            </div>
+            
+            <i class="fas fa-microphone text-gray-700 group-hover:text-black transition-colors mic-icon"></i>
+            
+            <span class="font-mono text-xs font-bold text-gray-800 uppercase tracking-wider mic-label">Talk to me</span>
+        </button>
+    </div>
+
+    <!-- Global Chat Widget (Fixed Bottom Right) -->
+    <button class="fixed bottom-6 right-6 z-[100] w-14 h-14 bg-gray-900 border border-gray-700 text-white rounded-2xl shadow-[0_10px_30px_rgb(0,0,0,0.15)] hover:bg-black hover:-translate-y-1 transition-all duration-300 group flex items-center justify-center">
+        <i class="fas fa-comment-dots text-xl"></i>
+        <!-- Status Dot -->
+        <span class="absolute -top-1.5 -right-1.5 flex h-4 w-4">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex h-4 w-4 rounded-full bg-emerald-500 border-2 border-gray-900"></span>
+        </span>
+    </button>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const icon = btn.querySelector('i');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+                icon.classList.add('fa-bars');
+                icon.classList.remove('fa-times');
+            });
+        });
+
+        // Navbar blur on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.style.borderBottom = '1px solid rgba(0, 0, 0, 0.05)';
+                navbar.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.05)';
+            } else {
+                navbar.style.borderBottom = '1px solid rgba(0, 0, 0, 0.05)';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+        
+        // Scroll Reveal
+        const revealElements = document.querySelectorAll('.premium-card, .timeline-item, .animate-fade-in-up');
+        const revealOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!entry.target.classList.contains('animate-fade-in-up')) {
+                        entry.target.classList.add('animate-fade-in-up');
+                    }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, revealOptions);
+        
+        revealElements.forEach(el => {
+            if (!el.classList.contains('animate-fade-in-up')) {
+                el.style.opacity = '0';
+                revealOnScroll.observe(el);
+            }
+        });
+
+        // --- LLM Typing Effect ---
+        const typingText = document.getElementById('typing-text');
+        const phrases = ["AI Engineer.", "ML Researcher.", "Agent Builder."];
+        let phraseIndex = 0;
+        let letterIndex = 0;
+        let isDeleting = false;
+
+        function typeLoop() {
+            const currentPhrase = phrases[phraseIndex];
+            if (isDeleting) {
+                typingText.textContent = currentPhrase.substring(0, letterIndex - 1);
+                letterIndex--;
+            } else {
+                typingText.textContent = currentPhrase.substring(0, letterIndex + 1);
+                letterIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && letterIndex === currentPhrase.length) {
+                typeSpeed = 2000; 
+                isDeleting = true;
+            } else if (isDeleting && letterIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typeSpeed = 500; 
+            }
+
+            setTimeout(typeLoop, typeSpeed);
+        }
+        setTimeout(typeLoop, 1000); 
+
+        // --- Interactive Neural Net Canvas (Hero) ---
+        const nCanvas = document.getElementById('neural-canvas');
+        const nCtx = nCanvas.getContext('2d');
+        let nWidth, nHeight, nParticles = [];
+        const mouse = { x: null, y: null };
+
+        function resizeN() {
+            nWidth = nCanvas.width = nCanvas.parentElement.offsetWidth;
+            nHeight = nCanvas.height = nCanvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resizeN);
+        resizeN();
+
+        window.addEventListener('mousemove', (e) => {
+            const rect = nCanvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        });
+        window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+
+        class Node {
+            constructor() {
+                this.x = Math.random() * nWidth;
+                this.y = Math.random() * nHeight;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 1.5 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > nWidth) this.vx *= -1;
+                if (this.y < 0 || this.y > nHeight) this.vy *= -1;
+            }
+            draw() {
+                nCtx.beginPath();
+                nCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                nCtx.fillStyle = 'rgba(15, 23, 42, 0.2)'; 
+                nCtx.fill();
+            }
+        }
+        for (let i = 0; i < 60; i++) nParticles.push(new Node());
+
+        function animateNeural() {
+            nCtx.clearRect(0, 0, nWidth, nHeight);
+            nParticles.forEach(p => { p.update(); p.draw(); });
+
+            for (let i = 0; i < nParticles.length; i++) {
+                for (let j = i + 1; j < nParticles.length; j++) {
+                    const dx = nParticles[i].x - nParticles[j].x;
+                    const dy = nParticles[i].y - nParticles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 100) {
+                        nCtx.beginPath();
+                        nCtx.moveTo(nParticles[i].x, nParticles[i].y);
+                        nCtx.lineTo(nParticles[j].x, nParticles[j].y);
+                        nCtx.strokeStyle = `rgba(15, 23, 42, ${0.1 - dist/100 * 0.1})`;
+                        nCtx.stroke();
+                    }
+                }
+                if (mouse.x != null) {
+                    const dx = nParticles[i].x - mouse.x;
+                    const dy = nParticles[i].y - mouse.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        nCtx.beginPath();
+                        nCtx.moveTo(nParticles[i].x, nParticles[i].y);
+                        nCtx.lineTo(mouse.x, mouse.y);
+                        nCtx.strokeStyle = `rgba(14, 165, 233, ${0.2 - dist/150 * 0.2})`; 
+                        nCtx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateNeural);
+        }
+        animateNeural();
+
+        // --- Data Graph Canvas (Resume Section) ---
+        const gCanvas = document.getElementById('graph-canvas');
+        const gCtx = gCanvas.getContext('2d');
+        let gWidth, gHeight;
+        let offset = 0;
+
+        function resizeG() {
+            gWidth = gCanvas.width = gCanvas.parentElement.offsetWidth;
+            gHeight = gCanvas.height = gCanvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resizeG);
+        resizeG();
+
+        function animateGraph() {
+            gCtx.clearRect(0, 0, gWidth, gHeight);
+            
+            // Draw a subtle animated loss curve / sine wave
+            gCtx.beginPath();
+            for(let i = 0; i < gWidth; i += 10) {
+                const y = Math.sin((i + offset) * 0.005) * 50 + gHeight/2 + Math.cos((i + offset) * 0.01) * 20;
+                if(i === 0) gCtx.moveTo(i, y);
+                else gCtx.lineTo(i, y);
+            }
+            gCtx.strokeStyle = 'rgba(15, 23, 42, 0.05)';
+            gCtx.lineWidth = 2;
+            gCtx.stroke();
+            
+            offset -= 2;
+            requestAnimationFrame(animateGraph);
+        }
+        animateGraph();
+
+        // --- Voice Bot ---
+        (function() {
+            let ws = null;
+            let audioCtx = null;
+            let micStream = null;
+            let scriptNode = null;
+            let gainNode = null;
+            let connected = false;
+            let playQueue = [];
+            let isPlaying = false;
+            let nextPlayTime = 0;
+            let recording = false;
+            const ACCUM_SAMPLES = 1600;
+            let accBuf = [];
+            let accumTimer = null;
+
+            const WS_URL = 'wss://4524-49-43-161-149.ngrok-free.app/ws/audio';
+            const SAMPLE_RATE = 16000;
+            const CHUNK_SIZE = 256;
+
+            const micBtn = document.getElementById('talkMicBtn');
+            const micStatus = document.getElementById('micStatus');
+            const statusDot = micStatus.querySelector('.mic-status-dot');
+            const statusText = micStatus.querySelector('.mic-status-text');
+
+            function setMicStatus(text, colorClass) {
+                statusText.textContent = text;
+                statusDot.className = 'w-1.5 h-1.5 rounded-full mic-status-dot ' + colorClass;
+                micStatus.classList.add('visible');
+            }
+
+            function hideMicStatus() {
+                micStatus.classList.remove('visible');
+            }
+
+            function connect() {
+                if (ws) return;
+                setMicStatus('Connecting...', 'dot-amber');
+                ws = new WebSocket(WS_URL);
+                ws.binaryType = 'arraybuffer';
+
+                ws.onopen = () => {
+                    connected = true;
+                    micBtn.classList.add('active');
+                    setMicStatus('Listening', 'dot-green');
+                    startMic();
+                };
+
+                ws.onmessage = (e) => {
+                    if (e.data instanceof ArrayBuffer) {
+                        const samples = new Int16Array(e.data);
+                        queuePlayback(samples);
+                    }
+                };
+
+                ws.onclose = () => {
+                    connected = false;
+                    micBtn.classList.remove('active');
+                    stopMic();
+                    hideMicStatus();
+                    ws = null;
+                };
+
+                ws.onerror = () => {
+                    setMicStatus('Connection error', 'dot-red');
+                    setTimeout(hideMicStatus, 3000);
+                };
+            }
+
+            function disconnect() {
+                if (ws) {
+                    ws.onclose = null;
+                    ws.close();
+                    ws = null;
+                }
+                connected = false;
+                stopMic();
+                micBtn.classList.remove('active');
+                hideMicStatus();
+            }
+
+            async function startMic() {
+                try {
+                    audioCtx = new AudioContext({ sampleRate: SAMPLE_RATE });
+                    micStream = await navigator.mediaDevices.getUserMedia({
+                        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+                    });
+                    const source = audioCtx.createMediaStreamSource(micStream);
+                    gainNode = audioCtx.createGain();
+                    gainNode.gain.value = 1.0;
+                    source.connect(gainNode);
+
+                    scriptNode = audioCtx.createScriptProcessor(CHUNK_SIZE, 1, 1);
+                    gainNode.connect(scriptNode);
+                    scriptNode.connect(audioCtx.destination);
+
+                    scriptNode.onaudioprocess = (e) => {
+                        if (!connected) return;
+                        const input = e.inputBuffer.getChannelData(0);
+                        const int16 = new Int16Array(input.length);
+                        for (let i = 0; i < input.length; i++) {
+                            const s = Math.max(-1, Math.min(1, input[i]));
+                            int16[i] = s < 0 ? s * 32768 : s * 32767;
+                        }
+                        ws.send(int16.buffer);
+                    };
+
+                    recording = true;
+                } catch (err) {
+                    setMicStatus('Mic error', 'dot-red');
+                    setTimeout(hideMicStatus, 3000);
+                }
+            }
+
+            function stopMic() {
+                recording = false;
+                if (accumTimer) { clearTimeout(accumTimer); accumTimer = null; }
+                accBuf = [];
+                if (scriptNode) { scriptNode.disconnect(); scriptNode = null; }
+                if (gainNode) { gainNode.disconnect(); gainNode = null; }
+                if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+                if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
+                playQueue = [];
+                isPlaying = false;
+            }
+
+            function flushAccum() {
+                if (accBuf.length === 0) return;
+                if (accumTimer) { clearTimeout(accumTimer); accumTimer = null; }
+                const totalLen = accBuf.reduce((s, a) => s + a.length, 0);
+                const merged = new Int16Array(totalLen);
+                let offset = 0;
+                for (const a of accBuf) { merged.set(a, offset); offset += a.length; }
+                accBuf = [];
+                playQueue.push(merged);
+                if (!isPlaying) playNext();
+            }
+
+            function scheduleAccumFlush() {
+                if (accumTimer) clearTimeout(accumTimer);
+                accumTimer = setTimeout(flushAccum, 200);
+            }
+
+            function queuePlayback(samples) {
+                accBuf.push(samples);
+                let total = 0;
+                for (const a of accBuf) total += a.length;
+                if (total >= ACCUM_SAMPLES) flushAccum();
+                scheduleAccumFlush();
+            }
+
+            function playNext() {
+                if (playQueue.length === 0) { isPlaying = false; return; }
+                isPlaying = true;
+                const samples = playQueue.shift();
+
+                if (!audioCtx || audioCtx.state === 'closed') { isPlaying = false; return; }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const buf = audioCtx.createBuffer(1, samples.length, SAMPLE_RATE);
+                const ch = buf.getChannelData(0);
+                for (let i = 0; i < samples.length; i++) ch[i] = samples[i] / 32768;
+
+                const src = audioCtx.createBufferSource();
+                src.buffer = buf;
+                src.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+                if (now >= nextPlayTime) nextPlayTime = now;
+                src.start(nextPlayTime);
+                nextPlayTime += samples.length / SAMPLE_RATE;
+                src.onended = () => playNext();
+            }
+
+            micBtn.addEventListener('click', () => {
+                if (connected) disconnect();
+                else connect();
+            });
+        })();
+
+    </script>
+</body>
+</html>
