@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from agent import VoiceAgentController
 from browser_device import BrowserAudioDevice
+from fastapi.staticfiles import StaticFiles
+
+
 
 
 app = FastAPI(title="Portfolio Voice Bot")
@@ -17,9 +20,11 @@ app.add_middleware(
 )
 
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 @app.get("/")
 async def index():
-    return FileResponse("static/classic.html")
+    return FileResponse("static/experiment.html")
 
 
 @app.websocket("/ws/audio")
