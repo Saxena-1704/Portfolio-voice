@@ -6,4 +6,3 @@ groq==1.5.0
 cartesia[websockets]==3.3.0
 fastapi==0.139.0
 uvicorn[standard]==0.51.0
-sounddevice

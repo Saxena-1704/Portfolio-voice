@@ -1,6 +1,6 @@
 import asyncio
 import numpy as np
-from audio_device import AudioDevice, LocalAudioDevice
+from audio_device import AudioDevice
 from VAD import VoiceActivityDetector
 from stt_cartesia import CartesiaSTT
 from llm import LLM
@@ -22,7 +22,7 @@ class VoiceAgentController:
         conversation: ConversationManager | None = None,
         event_bus: EventBus | None = None,
     ):
-        self.audio_device = audio_device or LocalAudioDevice()
+        self.audio_device = audio_device
         self.vad = vad or VoiceActivityDetector()
         self.stt = stt or CartesiaSTT()
         self.llm = llm or LLM()
@@ -136,17 +136,3 @@ class VoiceAgentController:
         if self._sm.state == CallState.SPEAKING:
             self._sm.transition(CallEvent.PLAYBACK_END)
 
-
-async def main():
-    controller = VoiceAgentController()
-    try:
-        await controller.run()
-    except KeyboardInterrupt:
-        await controller.stop()
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        pass

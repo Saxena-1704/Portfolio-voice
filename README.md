@@ -44,7 +44,7 @@ A modular, async-first voice agent with **Twilio telephony**, **Cartesia STT/TTS
 | File | What it does |
 |------|-------------|
 | `agent.py` | **The conductor.** Owns all components, runs the state machine, processes speech segments from an async queue, handles barge-in. Accepts any `AudioDevice` implementation. |
-| `audio_device.py` | **Audio I/O abstraction.** `AudioDevice` (ABC) with `start()`, `play()`, `stop_playback()`, `close()`. `LocalAudioDevice` implements it via `sounddevice` for laptop mic/speaker. |
+| `audio_device.py` | **Audio I/O abstraction.** `AudioDevice` (ABC) with `start()`, `play()`, `stop_playback()`, `close()`. |
 | `twilio_device.py` | **Twilio audio device.** Implements `AudioDevice` over Twilio WebSocket media streams. Converts µ-law (8 kHz) ↔ linear PCM (16 kHz). |
 | `twilio_server.py` | **FastAPI server** (port 8765). Endpoints: `POST /twilio/incoming_call` (TwiML), `POST /twilio/make_call` (outbound), `WS /twilio/media-stream` (real-time audio). Creates one `VoiceAgentController` per call. |
 | `stt_cartesia.py` | **Speech-to-Text** via Cartesia WebSocket API (model `ink-2`). Sends PCM chunks, receives streaming transcripts. |
@@ -70,8 +70,8 @@ A modular, async-first voice agent with **Twilio telephony**, **Cartesia STT/TTS
 
 | File | Replaced by |
 |------|-------------|
-| `microphone.py` | `LocalAudioDevice` in `audio_device.py` |
-| `speaker.py` | `LocalAudioDevice` in `audio_device.py` |
+| `microphone.py` | Removed (was `LocalAudioDevice`) |
+| `speaker.py` | Removed (was `LocalAudioDevice`) |
 | `stt.py` | `CartesiaSTT` in `stt_cartesia.py` |
 | `tts.py` | `CartesiaTTS` in `tts_cartesia.py` |
 
@@ -224,7 +224,7 @@ Or run `python make_call.py` directly.
 
 ## Key Design Points
 
-- **`AudioDevice` abstraction** — `LocalAudioDevice` for local mic/speaker, `TwilioMediaStreamDevice` for phone calls. Swap by passing a different device to `VoiceAgentController`.
+- **`AudioDevice` abstraction** — `BrowserAudioDevice` for browser WebSocket, `TwilioMediaStreamDevice` for phone calls. Swap by passing a different device to `VoiceAgentController`.
 - **Streaming token→audio** — LLM tokens are pushed to Cartesia TTS incrementally via `TextToSpeechStream.push()`, enabling concurrent generation and playback with `asyncio.gather`.
 - **Barge-in** — VAD's `started` flag triggers immediate TTS interruption. VAD state is reset before each TTS playback to avoid stale detection.
 - **Real-time throttling** — `TwilioMediaStreamDevice.play()` uses `time.monotonic()` drift compensation to stay synchronized with the 16 kHz audio clock.
@@ -236,7 +236,6 @@ Or run `python make_call.py` directly.
 
 | Package | Used for |
 |---------|----------|
-| `sounddevice` | Local audio I/O (`LocalAudioDevice`) |
 | `silero-vad` | Voice Activity Detection |
 | `numpy` | Audio data manipulation |
 | `groq` | Groq LLM API |
